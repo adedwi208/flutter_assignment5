@@ -11,26 +11,59 @@ class ProfilePage extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         centerTitle: true,
       ),
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Custom Widget 1: ProfileAvatar
-            ProfileAvatar(imageUrl: ''),
-            SizedBox(height: 16),
-            // Custom Widget 2: ProfileInfo (Passing parameter name & role)
-            ProfileInfo(
-              name: 'Ade Dwi Herdiansyah',
-              role: 'Informatics Student',
-            ),
-          ],
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              // Custom Widget 1: ProfileAvatar
+              const ProfileAvatar(imageUrl: ''),
+              const SizedBox(height: 16),
+
+              // Custom Widget 2: ProfileInfo
+              const ProfileInfo(
+                name: 'Ade Dwi Herdiansyah',
+                role: 'Informatics Student',
+              ),
+              const SizedBox(height: 16),
+
+              // Tombol Edit Profil
+              ElevatedButton(
+                onPressed: () {
+                  // Aksi ketika tombol ditekan
+                },
+                child: const Text('Edit Profil'),
+              ),
+              const SizedBox(height: 24),
+
+              const Divider(),
+              const SizedBox(height: 16),
+
+              // Layout Row dengan Expanded & Extract Widget
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    child: ProfileStatItem(value: '3', label: 'Proyek'),
+                  ),
+                  Expanded(
+                    child: ProfileStatItem(value: '4.5M', label: 'Followers'),
+                  ),
+                  Expanded(
+                    child: ProfileStatItem(value: '350', label: 'Following'),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-/// Custom Widget untuk menampilkan Avatar / Foto Profil
+/// Custom Widget 1: Avatar / Foto Profil
 class ProfileAvatar extends StatelessWidget {
   final String imageUrl;
 
@@ -42,7 +75,7 @@ class ProfileAvatar extends StatelessWidget {
   }
 }
 
-/// Custom Widget untuk menampilkan Informasi Teks Profil
+/// Custom Widget 2: Informasi Teks Profil
 class ProfileInfo extends StatelessWidget {
   final String name;
   final String role;
@@ -59,6 +92,29 @@ class ProfileInfo extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(role, style: const TextStyle(fontSize: 14, color: Colors.grey)),
+      ],
+    );
+  }
+}
+
+/// Custom Widget 3: Item Statistik (Angka + Label)
+class ProfileStatItem extends StatelessWidget {
+  final String value;
+  final String label;
+
+  const ProfileStatItem({super.key, required this.value, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          value,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 4),
+        Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
       ],
     );
   }
