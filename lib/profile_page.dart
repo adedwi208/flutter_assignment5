@@ -17,11 +17,11 @@ class ProfilePage extends StatelessWidget {
           child: Column(
             children: [
               const SizedBox(height: 20),
-              // Custom Widget 1: ProfileAvatar
+              // Custom Widget: ProfileAvatar
               const ProfileAvatar(imageUrl: ''),
               const SizedBox(height: 16),
 
-              // Custom Widget 2: ProfileInfo
+              // Custom Widget: ProfileInfo
               const ProfileInfo(
                 name: 'Ade Dwi Herdiansyah',
                 role: 'Informatics Student',
@@ -30,9 +30,7 @@ class ProfilePage extends StatelessWidget {
 
               // Tombol Edit Profil
               ElevatedButton(
-                onPressed: () {
-                  // Aksi ketika tombol ditekan
-                },
+                onPressed: () {},
                 child: const Text('Edit Profil'),
               ),
               const SizedBox(height: 24),
@@ -40,20 +38,11 @@ class ProfilePage extends StatelessWidget {
               const Divider(),
               const SizedBox(height: 16),
 
-              // Layout Row dengan Expanded & Extract Widget
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Expanded(
-                    child: ProfileStatItem(value: '3', label: 'Proyek'),
-                  ),
-                  Expanded(
-                    child: ProfileStatItem(value: '4.5M', label: 'Followers'),
-                  ),
-                  Expanded(
-                    child: ProfileStatItem(value: '350', label: 'Following'),
-                  ),
-                ],
+              // Custom Widget Hasil Ekstraksi: ProfileStats
+              const ProfileStats(
+                projects: '3',
+                followers: '4.5M',
+                following: '350',
               ),
             ],
           ),
@@ -63,7 +52,7 @@ class ProfilePage extends StatelessWidget {
   }
 }
 
-/// Custom Widget 1: Avatar / Foto Profil
+/// Custom Widget: Avatar / Foto Profil
 class ProfileAvatar extends StatelessWidget {
   final String imageUrl;
 
@@ -75,7 +64,7 @@ class ProfileAvatar extends StatelessWidget {
   }
 }
 
-/// Custom Widget 2: Informasi Teks Profil
+/// Custom Widget: Informasi Teks Profil
 class ProfileInfo extends StatelessWidget {
   final String name;
   final String role;
@@ -97,12 +86,45 @@ class ProfileInfo extends StatelessWidget {
   }
 }
 
-/// Custom Widget 3: Item Statistik (Angka + Label)
-class ProfileStatItem extends StatelessWidget {
+/// Custom Widget Komposisi: ProfileStats
+/// Membungkus Row, Expanded, dan beberapa StatItem sekaligus
+class ProfileStats extends StatelessWidget {
+  final String projects;
+  final String followers;
+  final String following;
+
+  const ProfileStats({
+    super.key,
+    required this.projects,
+    required this.followers,
+    required this.following,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Expanded(
+          child: StatItem(value: projects, label: 'Proyek'),
+        ),
+        Expanded(
+          child: StatItem(value: followers, label: 'Followers'),
+        ),
+        Expanded(
+          child: StatItem(value: following, label: 'Following'),
+        ),
+      ],
+    );
+  }
+}
+
+/// Custom Widget Atom: StatItem (Item Statistik Individu)
+class StatItem extends StatelessWidget {
   final String value;
   final String label;
 
-  const ProfileStatItem({super.key, required this.value, required this.label});
+  const StatItem({super.key, required this.value, required this.label});
 
   @override
   Widget build(BuildContext context) {
