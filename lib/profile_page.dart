@@ -11,133 +11,186 @@ class ProfilePage extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              const SizedBox(height: 20),
-              // Custom Widget: ProfileAvatar
-              const ProfileAvatar(imageUrl: ''),
-              const SizedBox(height: 16),
+      body: SingleChildScrollView(child: ProfileInfo()),
+    );
+  }
+}
 
-              // Custom Widget: ProfileInfo
-              const ProfileInfo(
-                name: 'Ade Dwi Herdiansyah',
-                role: 'Informatics Student',
-              ),
-              const SizedBox(height: 16),
+class ProfileInfo extends StatelessWidget {
+  const ProfileInfo({super.key});
 
-              // Tombol Edit Profil
-              ElevatedButton(
-                onPressed: () {},
-                child: const Text('Edit Profil'),
-              ),
-              const SizedBox(height: 24),
+  final String userName = "Ade Dwi Herdiansyah";
+  final String role = "Informatics Student";
 
-              const Divider(),
-              const SizedBox(height: 16),
+  final List<String> experiences = const ["Staff Electrical Shop - Lion Air"];
 
-              // Custom Widget Hasil Ekstraksi: ProfileStats
-              const ProfileStats(
-                projects: '3',
-                followers: '4.5M',
-                following: '350',
-              ),
-            ],
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+      child: Column(
+        children: [
+          // 1. Profile Avatar & Tombol Edit (Di posisi paling atas)
+          ProfileAvatar(userName: userName, role: role),
+
+          const SizedBox(height: 12),
+
+          // 2. Nama Lengkap
+          Text(
+            userName,
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
           ),
-        ),
+
+          const SizedBox(height: 4),
+
+          // 3. Role / Subtitle
+          Text(
+            role,
+            style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+            textAlign: TextAlign.center,
+          ),
+
+          const SizedBox(height: 20),
+
+          // 4. Baris Statistik (Project, Followers, Following)
+          const ProfileStats(),
+
+          const SizedBox(height: 20),
+
+          // 5. Header Judul Project Experiences
+          const Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              "Project Experiences",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+
+          const Divider(height: 16),
+
+          // 6. ListView Pengalaman Menggunakan ExperienceCard
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: experiences.length,
+            itemBuilder: (context, index) {
+              return ExperienceCard(title: experiences[index]);
+            },
+          ),
+        ],
       ),
     );
   }
 }
 
-/// Custom Widget: Avatar / Foto Profil
+/// Custom Widget: Avatar & Tombol Edit Profile
 class ProfileAvatar extends StatelessWidget {
-  final String imageUrl;
+  final String userName;
+  final String role;
 
-  const ProfileAvatar({super.key, required this.imageUrl});
+  const ProfileAvatar({super.key, required this.userName, required this.role});
 
   @override
   Widget build(BuildContext context) {
-    return CircleAvatar(radius: 50, backgroundImage: NetworkImage(imageUrl));
+    return Column(
+      children: [
+        const CircleAvatar(
+          radius: 50,
+          backgroundColor: Colors.grey,
+          child: Icon(Icons.person, size: 50, color: Colors.white),
+        ),
+        const SizedBox(height: 12),
+        ElevatedButton.icon(
+          onPressed: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("Fitur Edit belum tersedia saat ini."),
+              ),
+            );
+          },
+          icon: const Icon(Icons.edit, size: 18),
+          label: const Text("Edit Profile"),
+        ),
+      ],
+    );
   }
 }
 
-/// Custom Widget: Informasi Teks Profil
-class ProfileInfo extends StatelessWidget {
-  final String name;
-  final String role;
+/// Custom Widget: Kontainer Statistik Profil
+class ProfileStats extends StatelessWidget {
+  const ProfileStats({super.key});
 
-  const ProfileInfo({super.key, required this.name, required this.role});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.blue[50],
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: const Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          StatItem(count: "12", label: "Project"),
+          StatItem(count: "1.2K", label: "Followers"),
+          StatItem(count: "350", label: "Following"),
+        ],
+      ),
+    );
+  }
+}
+
+/// Custom Widget: Item Angka & Label Statistik
+class StatItem extends StatelessWidget {
+  final String count;
+  final String label;
+
+  const StatItem({super.key, required this.count, required this.label});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Text(
-          name,
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          count,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.blueAccent,
+          ),
         ),
-        const SizedBox(height: 8),
-        Text(role, style: const TextStyle(fontSize: 14, color: Colors.grey)),
+        const SizedBox(height: 4),
+        Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
       ],
     );
   }
 }
 
-/// Custom Widget Komposisi: ProfileStats
-/// Membungkus Row, Expanded, dan beberapa StatItem sekaligus
-class ProfileStats extends StatelessWidget {
-  final String projects;
-  final String followers;
-  final String following;
+/// Custom Widget: Card Item Pengalaman dalam ListView
+class ExperienceCard extends StatelessWidget {
+  final String title;
+  final IconData icon;
 
-  const ProfileStats({
+  const ExperienceCard({
     super.key,
-    required this.projects,
-    required this.followers,
-    required this.following,
+    required this.title,
+    this.icon = Icons.work,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Expanded(
-          child: StatItem(value: projects, label: 'Proyek'),
+    return Card(
+      elevation: 2,
+      margin: const EdgeInsets.symmetric(vertical: 4.0),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+      child: ListTile(
+        leading: Icon(icon, color: Colors.blueAccent),
+        title: Text(
+          title,
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
         ),
-        Expanded(
-          child: StatItem(value: followers, label: 'Followers'),
-        ),
-        Expanded(
-          child: StatItem(value: following, label: 'Following'),
-        ),
-      ],
-    );
-  }
-}
-
-/// Custom Widget Atom: StatItem (Item Statistik Individu)
-class StatItem extends StatelessWidget {
-  final String value;
-  final String label;
-
-  const StatItem({super.key, required this.value, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          value,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 4),
-        Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-      ],
+      ),
     );
   }
 }
