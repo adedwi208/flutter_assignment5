@@ -224,8 +224,8 @@ class ProfileStats extends StatelessWidget {
       child: const Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          StatItem(count: "12", label: "Project"),
-          StatItem(count: "1.2K", label: "Followers"),
+          StatItem(count: "3", label: "Project"),
+          StatItem(count: "4.5M", label: "Followers"),
           StatItem(count: "350", label: "Following"),
         ],
       ),
