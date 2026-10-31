@@ -8,13 +8,16 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  // Variabel state dinamis (tidak lagi di-hardcode di dalam StatelessWidget)
+  // GlobalKey untuk menangani validasi Form di dalam Dialog
+  final _formKey = GlobalKey<FormState>();
+
+  // State variabel dinamis
   String userName = "Ade Dwi Herdiansyah";
   String role = "Informatics Student";
 
   final List<String> experiences = const ["Staff Electrical Shop - Lion Air"];
 
-  // Controller untuk menangani input dari Dialog Edit
+  // Controller untuk membaca input dari TextFormField
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _roleController = TextEditingController();
 
@@ -25,7 +28,7 @@ class _ProfilePageState extends State<ProfilePage> {
     super.dispose();
   }
 
-  // Fungsi untuk menampilkan dialog input pengubahan data profil
+  // Fungsi memunculkan Dialog Edit Profil dengan TextFormField
   void _showEditProfileDialog() {
     _nameController.text = userName;
     _roleController.text = role;
@@ -35,21 +38,42 @@ class _ProfilePageState extends State<ProfilePage> {
       builder: (context) {
         return AlertDialog(
           title: const Text('Edit Profil'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Nama Lengkap'),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _roleController,
-                decoration: const InputDecoration(
-                  labelText: 'Role / Pekerjaan',
+          content: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // TextFormField untuk nama pengguna
+                TextFormField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Nama Lengkap',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Nama tidak boleh kosong';
+                    }
+                    return null;
+                  },
                 ),
-              ),
-            ],
+                const SizedBox(height: 12),
+                // TextFormField untuk role / pekerjaan
+                TextFormField(
+                  controller: _roleController,
+                  decoration: const InputDecoration(
+                    labelText: 'Role / Pekerjaan',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Role tidak boleh kosong';
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ),
           ),
           actions: [
             TextButton(
@@ -58,12 +82,15 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             ElevatedButton(
               onPressed: () {
-                // Mengubah state secara dinamis menggunakan setState
-                setState(() {
-                  userName = _nameController.text;
-                  role = _roleController.text;
-                });
-                Navigator.pop(context);
+                // Validasi input TextFormField
+                if (_formKey.currentState!.validate()) {
+                  // Memperbarui state userName & role di layar utama
+                  setState(() {
+                    userName = _nameController.text.trim();
+                    role = _roleController.text.trim();
+                  });
+                  Navigator.pop(context);
+                }
               },
               child: const Text('Simpan'),
             ),
@@ -86,7 +113,7 @@ class _ProfilePageState extends State<ProfilePage> {
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
           child: Column(
             children: [
-              // 1. Avatar & Tombol Edit (Aksi dipassing ke dialog input)
+              // 1. Profile Avatar & Tombol Edit
               ProfileAvatar(
                 userName: userName,
                 role: role,
@@ -95,7 +122,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
               const SizedBox(height: 12),
 
-              // 2. Teks Nama Dinamis
+              // 2. Nama Lengkap Dinamis
               Text(
                 userName,
                 style: const TextStyle(
@@ -107,7 +134,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
               const SizedBox(height: 4),
 
-              // 3. Teks Role Dinamis
+              // 3. Role / Subtitle Dinamis
               Text(
                 role,
                 style: TextStyle(fontSize: 16, color: Colors.grey[700]),
@@ -116,12 +143,12 @@ class _ProfilePageState extends State<ProfilePage> {
 
               const SizedBox(height: 20),
 
-              // 4. Baris Statistik
+              // 4. Baris Statistik Profil
               const ProfileStats(),
 
               const SizedBox(height: 20),
 
-              // 5. Judul Project Experiences
+              // 5. Header Judul Project Experiences
               const Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -132,7 +159,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
               const Divider(height: 16),
 
-              // 6. ListView Pengalaman
+              // 6. ListView Daftar Pengalaman
               ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -149,7 +176,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 }
 
-/// Custom Widget: Avatar & Tombol Edit Profile (Menerima Callback OnPressed)
+/// Custom Widget: Avatar & Tombol Edit Profile
 class ProfileAvatar extends StatelessWidget {
   final String userName;
   final String role;
@@ -182,7 +209,7 @@ class ProfileAvatar extends StatelessWidget {
   }
 }
 
-/// Custom Widget: Kontainer Statistik Profil
+/// Custom Widget: Baris Statistik Profil
 class ProfileStats extends StatelessWidget {
   const ProfileStats({super.key});
 
