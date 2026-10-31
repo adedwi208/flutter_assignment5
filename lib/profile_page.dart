@@ -1,7 +1,77 @@
 import 'package:flutter/material.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  // Variabel state dinamis (tidak lagi di-hardcode di dalam StatelessWidget)
+  String userName = "Ade Dwi Herdiansyah";
+  String role = "Informatics Student";
+
+  final List<String> experiences = const ["Staff Electrical Shop - Lion Air"];
+
+  // Controller untuk menangani input dari Dialog Edit
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _roleController = TextEditingController();
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _roleController.dispose();
+    super.dispose();
+  }
+
+  // Fungsi untuk menampilkan dialog input pengubahan data profil
+  void _showEditProfileDialog() {
+    _nameController.text = userName;
+    _roleController.text = role;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Edit Profil'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _nameController,
+                decoration: const InputDecoration(labelText: 'Nama Lengkap'),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _roleController,
+                decoration: const InputDecoration(
+                  labelText: 'Role / Pekerjaan',
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Batal'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // Mengubah state secara dinamis menggunakan setState
+                setState(() {
+                  userName = _nameController.text;
+                  role = _roleController.text;
+                });
+                Navigator.pop(context);
+              },
+              child: const Text('Simpan'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -11,85 +81,86 @@ class ProfilePage extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         centerTitle: true,
       ),
-      body: SingleChildScrollView(child: ProfileInfo()),
-    );
-  }
-}
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+          child: Column(
+            children: [
+              // 1. Avatar & Tombol Edit (Aksi dipassing ke dialog input)
+              ProfileAvatar(
+                userName: userName,
+                role: role,
+                onEditPressed: _showEditProfileDialog,
+              ),
 
-class ProfileInfo extends StatelessWidget {
-  const ProfileInfo({super.key});
+              const SizedBox(height: 12),
 
-  final String userName = "Ade Dwi Herdiansyah";
-  final String role = "Informatics Student";
+              // 2. Teks Nama Dinamis
+              Text(
+                userName,
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
 
-  final List<String> experiences = const ["Staff Electrical Shop - Lion Air"];
+              const SizedBox(height: 4),
 
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-      child: Column(
-        children: [
-          // 1. Profile Avatar & Tombol Edit (Di posisi paling atas)
-          ProfileAvatar(userName: userName, role: role),
+              // 3. Teks Role Dinamis
+              Text(
+                role,
+                style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+                textAlign: TextAlign.center,
+              ),
 
-          const SizedBox(height: 12),
+              const SizedBox(height: 20),
 
-          // 2. Nama Lengkap
-          Text(
-            userName,
-            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            textAlign: TextAlign.center,
+              // 4. Baris Statistik
+              const ProfileStats(),
+
+              const SizedBox(height: 20),
+
+              // 5. Judul Project Experiences
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Project Experiences",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+
+              const Divider(height: 16),
+
+              // 6. ListView Pengalaman
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: experiences.length,
+                itemBuilder: (context, index) {
+                  return ExperienceCard(title: experiences[index]);
+                },
+              ),
+            ],
           ),
-
-          const SizedBox(height: 4),
-
-          // 3. Role / Subtitle
-          Text(
-            role,
-            style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-            textAlign: TextAlign.center,
-          ),
-
-          const SizedBox(height: 20),
-
-          // 4. Baris Statistik (Project, Followers, Following)
-          const ProfileStats(),
-
-          const SizedBox(height: 20),
-
-          // 5. Header Judul Project Experiences
-          const Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              "Project Experiences",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ),
-
-          const Divider(height: 16),
-
-          // 6. ListView Pengalaman Menggunakan ExperienceCard
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: experiences.length,
-            itemBuilder: (context, index) {
-              return ExperienceCard(title: experiences[index]);
-            },
-          ),
-        ],
+        ),
       ),
     );
   }
 }
 
-/// Custom Widget: Avatar & Tombol Edit Profile
+/// Custom Widget: Avatar & Tombol Edit Profile (Menerima Callback OnPressed)
 class ProfileAvatar extends StatelessWidget {
   final String userName;
   final String role;
+  final VoidCallback onEditPressed;
 
-  const ProfileAvatar({super.key, required this.userName, required this.role});
+  const ProfileAvatar({
+    super.key,
+    required this.userName,
+    required this.role,
+    required this.onEditPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -102,13 +173,7 @@ class ProfileAvatar extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         ElevatedButton.icon(
-          onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text("Fitur Edit belum tersedia saat ini."),
-              ),
-            );
-          },
+          onPressed: onEditPressed,
           icon: const Icon(Icons.edit, size: 18),
           label: const Text("Edit Profile"),
         ),
@@ -167,7 +232,7 @@ class StatItem extends StatelessWidget {
   }
 }
 
-/// Custom Widget: Card Item Pengalaman dalam ListView
+/// Custom Widget: Card Item Pengalaman
 class ExperienceCard extends StatelessWidget {
   final String title;
   final IconData icon;
